@@ -24,6 +24,11 @@ namespace FluentRegex.Core
         public static LiteralPattern Literal(string value) => new(value);
 
         /// <summary>
+        /// Creates a pattern that matches any whitespace character (equivalent to \s).
+        /// </summary>
+        public static WhitespacePattern Whitespace() => new();
+
+        /// <summary>
         /// Creates a pattern that matches any single character (equivalent to .).
         /// </summary>
         public static AnyCharPattern AnyChar() => new();
