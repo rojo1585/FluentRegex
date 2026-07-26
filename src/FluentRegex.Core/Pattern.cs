@@ -44,5 +44,9 @@ namespace FluentRegex.Core
         /// <param name="from">Start of the range (inclusive).</param>
         /// <param name="to">End of the range (inclusive).</param>
         public static CharSetPattern NotRange(char from, char to) => new(from, to, negated: true);
+        /// <summary>
+        /// Creates a pattern that matches a single digit (equivalent to \d).
+        /// </summary>
+        public static DigitPattern Digit() => new();
     }
 }
