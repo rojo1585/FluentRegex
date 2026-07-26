@@ -63,6 +63,11 @@ namespace FluentRegex.Core
         public static LetterPattern Letter() => new();
 
         /// <summary>
+        /// Creates a text pattern that matches alphabetic characters with configurable options.
+        /// </summary>
+        public static TextPattern Text() => new();
+
+        /// <summary>
         /// Creates a pattern that matches integer numbers.
         /// </summary>
         public static IntegerPattern Integer() => new();
