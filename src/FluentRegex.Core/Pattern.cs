@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace FluentRegex.Core
 {
@@ -14,6 +15,14 @@ namespace FluentRegex.Core
         /// Gets the regular expression string represented by this pattern.
         /// </summary>
         public abstract string Expression { get; }
+
+        /// <summary>
+        /// Creates a pattern that matches an exact literal string.
+        /// Special regex characters are automatically escaped.
+        /// </summary>
+        /// <param name="value">The literal text to match.</param>
+        public static LiteralPattern Literal(string value) => new(value);
+
         /// <summary>
         /// Creates a pattern that matches any single character (equivalent to .).
         /// </summary>
@@ -52,8 +61,12 @@ namespace FluentRegex.Core
         /// Creates a pattern that matches a single letter a-z or A-Z.
         /// </summary>
         public static LetterPattern Letter() => new();
+
+        /// <summary>
         /// Creates a pattern that matches integer numbers.
         /// </summary>
         public static IntegerPattern Integer() => new();
+
     }
 }
+
