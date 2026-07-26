@@ -49,6 +49,9 @@ namespace FluentRegex.Core
         /// </summary>
         public static DigitPattern Digit() => new();
         /// <summary>
+        /// Creates a pattern that matches a single letter a-z or A-Z.
+        /// </summary>
+        public static LetterPattern Letter() => new();
         /// Creates a pattern that matches integer numbers.
         /// </summary>
         public static IntegerPattern Integer() => new();
