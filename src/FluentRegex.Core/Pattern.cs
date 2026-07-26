@@ -76,7 +76,45 @@ namespace FluentRegex.Core
         /// Creates a pattern that matches integer numbers.
         /// </summary>
         public static IntegerPattern Integer() => new();
+        /// <summary>
+        /// Implicitly converts a Pattern to a <see cref="Regex"/> instance.
+        /// </summary>
+        public static implicit operator Regex(Pattern pattern) => new Regex(pattern.Expression);
 
+        /// <summary>
+        /// Implicitly converts a Pattern to its regex string representation.
+        /// </summary>
+        public static implicit operator string(Pattern pattern) => pattern.Expression;
+
+        /// <summary>
+        /// Indicates whether the specified input string matches the pattern.
+        /// </summary>
+        public bool IsMatch(string input) => Regex.IsMatch(input, Expression);
+
+        /// <summary>
+        /// Searches the input string for the first occurrence of the pattern.
+        /// </summary>
+        public Match Match(string input) => Regex.Match(input, Expression);
+
+        /// <summary>
+        /// Searches the input string for all occurrences of the pattern.
+        /// </summary>
+        public MatchCollection Matches(string input) => Regex.Matches(input, Expression);
+
+        /// <summary>
+        /// Replaces all occurrences of the pattern in the input string with the replacement string.
+        /// </summary>
+        public string Replace(string input, string replacement) => Regex.Replace(input, Expression, replacement);
+
+        /// <summary>
+        /// Splits the input string at each occurrence of the pattern.
+        /// </summary>
+        public string[] Split(string input) => [.. Regex.Split(input, Expression)];
+
+        /// <summary>
+        /// Returns the regex string representation of this pattern.
+        /// </summary>
+        public override string ToString() => Expression;
     }
 }
 
