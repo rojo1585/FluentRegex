@@ -48,5 +48,9 @@ namespace FluentRegex.Core
         /// Creates a pattern that matches a single digit (equivalent to \d).
         /// </summary>
         public static DigitPattern Digit() => new();
+        /// <summary>
+        /// Creates a pattern that matches integer numbers.
+        /// </summary>
+        public static IntegerPattern Integer() => new();
     }
 }
