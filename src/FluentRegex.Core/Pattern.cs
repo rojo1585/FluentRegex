@@ -128,17 +128,6 @@ namespace FluentRegex.Core
         }
 
         /// <summary>
-        /// Negation: wraps the pattern as a negative lookahead or character class negation
-        /// depending on the pattern type.
-        /// </summary>
-        public static Pattern operator !(Pattern pattern)
-        {
-            ArgumentNullException.ThrowIfNull(pattern);
-            return new NegationPattern(pattern);
-        }
-
-
-        /// <summary>
         /// Implicitly converts a Pattern to a <see cref="Regex"/> instance.
         /// </summary>
         public static implicit operator Regex(Pattern pattern) => new Regex(pattern.Expression);

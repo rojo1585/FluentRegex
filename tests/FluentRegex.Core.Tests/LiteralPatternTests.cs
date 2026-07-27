@@ -243,14 +243,6 @@ public class OperatorTests
         Assert.True(pattern.IsMatch("blue"));
         Assert.False(pattern.IsMatch("yellow"));
     }
-
-    [Fact]
-    public void Negation_NotOperator()
-    {
-        // !(Pattern.Literal("spam")) produces a negative lookahead
-        var notSpam = !Pattern.Literal("spam");
-        Assert.Equal("(?!spam)", (string)notSpam);
-    }
 }
 
 public class ConversionTests
@@ -907,14 +899,6 @@ public class PrecedenceTests
 
             Assert.True(isolatedDigit.ContainsMatch("a1b"));
             Assert.False(isolatedDigit.ContainsMatch("123"));
-        }
-
-        [Fact]
-        public void LookAround_SameAsNegationOperator()
-        {
-            var lookAheadNot = Pattern.LookAheadNot(Pattern.Literal("spam"));
-            var negation = !Pattern.Literal("spam");
-            Assert.Equal((string)lookAheadNot, (string)negation);
         }
 
         [Fact]
