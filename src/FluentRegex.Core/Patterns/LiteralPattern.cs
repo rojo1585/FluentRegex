@@ -26,4 +26,5 @@ namespace FluentRegex.Core.Patterns
             Expression = Regex.Escape(value);
         }
     }
+
 }
