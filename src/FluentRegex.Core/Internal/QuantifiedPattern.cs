@@ -13,15 +13,11 @@ namespace FluentRegex.Core.Internal
     {
         public override string Expression { get; }
 
+        internal override int Precedence => 2;
+
         internal QuantifiedPattern(Pattern inner, string quantifier)
         {
-            // Wrap in non-capturing group if the inner pattern is complex
-            // (contains alternation or is itself a quantified pattern)
-            var innerExpr = NeedsGrouping(inner.Expression)
-                ? $"(?:{inner.Expression})"
-                : inner.Expression;
-
-            Expression = $"{innerExpr}{quantifier}";
+            Expression = $"{inner.WrapIfBelow(2)}{quantifier}";
         }
 
         /// <summary>

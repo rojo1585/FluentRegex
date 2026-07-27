@@ -17,7 +17,22 @@ namespace FluentRegex.Core
         /// </summary>
         public abstract string Expression { get; }
 
-
+        /// <summary>
+        /// Gets the operator precedence of this pattern.
+        /// Higher values bind tighter. Used internally to determine when
+        /// non-capturing groups (?:...) are needed for correct semantics.
+        /// <para>
+        /// 0 = Alternation (lowest) | 1 = Concatenation |
+        /// 2 = Quantified | 3 = Atomic — literal, char class, etc. (highest)
+        /// </para>
+        /// </summary>
+        internal virtual int Precedence => 3;
+        /// <summary>
+        /// Returns the expression wrapped in a non-capturing group
+        /// if this pattern's precedence is below <paramref name="minPrecedence"/>.
+        /// </summary>
+        internal string WrapIfBelow(int minPrecedence) =>
+            Precedence < minPrecedence ? $"(?:{Expression})" : Expression;
         /// <summary>
         /// Matches zero or more occurrences (equivalent to * in regex).
         /// </summary>
