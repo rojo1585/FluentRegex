@@ -236,6 +236,92 @@ namespace FluentRegex.Core
         /// </summary>
         public static IntegerPattern Integer() => new();
 
+        #region Static Factory Methods — Groups
+
+        /// <summary>
+        /// Wraps a pattern in a non-capturing group (?:...).
+        /// </summary>
+        public static GroupPattern Group(Pattern inner)
+        {
+            ArgumentNullException.ThrowIfNull(inner);
+            return new GroupPattern(inner);
+        }
+
+        /// <summary>
+        /// Wraps a pattern in a named capturing group (?&lt;name&gt;...).
+        /// </summary>
+        public static NamedGroupPattern NamedGroup(string name, Pattern inner)
+        {
+            ArgumentNullException.ThrowIfNull(name);
+            ArgumentNullException.ThrowIfNull(inner);
+            return new NamedGroupPattern(name, inner);
+        }
+
+        #endregion
+
+        #region Static Factory Methods — Anchors
+
+        /// <summary>
+        /// Matches the start of the string (equivalent to ^).
+        /// </summary>
+        public static AnchorPattern Start() => new("^");
+
+        /// <summary>
+        /// Matches the end of the string (equivalent to $).
+        /// </summary>
+        public static AnchorPattern End() => new("$");
+
+        /// <summary>
+        /// Matches a word boundary (equivalent to \b).
+        /// </summary>
+        public static AnchorPattern WordBoundary() => new("\\b");
+
+        /// <summary>
+        /// Matches a non-word boundary (equivalent to \B).
+        /// </summary>
+        public static AnchorPattern NotWordBoundary() => new("\\B");
+
+        #endregion
+
+        #region Static Factory Methods — Lookarounds
+
+        /// <summary>
+        /// Positive lookahead: asserts that the pattern matches after the current position.
+        /// </summary>
+        public static LookaroundPattern LookAhead(Pattern inner)
+        {
+            ArgumentNullException.ThrowIfNull(inner);
+            return new LookaroundPattern("?=", inner);
+        }
+
+        /// <summary>
+        /// Negative lookahead: asserts that the pattern does NOT match after the current position.
+        /// </summary>
+        public static LookaroundPattern LookAheadNot(Pattern inner)
+        {
+            ArgumentNullException.ThrowIfNull(inner);
+            return new LookaroundPattern("?!", inner);
+        }
+
+        /// <summary>
+        /// Positive lookbehind: asserts that the pattern matches before the current position.
+        /// </summary>
+        public static LookaroundPattern LookBehind(Pattern inner)
+        {
+            ArgumentNullException.ThrowIfNull(inner);
+            return new LookaroundPattern("?<=", inner);
+        }
+
+        /// <summary>
+        /// Negative lookbehind: asserts that the pattern does NOT match before the current position.
+        /// </summary>
+        public static LookaroundPattern LookBehindNot(Pattern inner)
+        {
+            ArgumentNullException.ThrowIfNull(inner);
+            return new LookaroundPattern("?<!", inner);
+        }
+
+        #endregion
         /// <summary>
         /// Returns the regex string representation of this pattern.
         /// </summary>

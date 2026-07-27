@@ -669,4 +669,229 @@ public class PrecedenceTests
         Assert.True(phone.IsMatch("+525512345678"));
         Assert.False(phone.IsMatch("123"));
     }
+
+    public class GroupTests
+    {
+        [Fact]
+        public void Group_NonCapturing_Expression()
+        {
+            var p = Pattern.Group(Pattern.Digit().OneOrMore());
+            Assert.Equal(@"(?:\d+)", (string)p);
+        }
+
+        [Fact]
+        public void Group_PrecedenceIsAtomic()
+        {
+            var inner = Pattern.Literal("ab");
+            var grouped = Pattern.Group(inner);
+            var p = grouped.OneOrMore();
+            Assert.Equal(@"(?:ab)+", (string)p);
+        }
+
+        [Fact]
+        public void Group_WithAlternation()
+        {
+            var p = Pattern.Group(Pattern.Literal("a") | Pattern.Literal("b")).OneOrMore();
+            Assert.Equal(@"(?:a|b)+", (string)p);
+            Assert.True(p.IsMatch("ab"));
+            Assert.True(p.IsMatch("ba"));
+            Assert.False(p.IsMatch("ac"));
+        }
+
+        [Fact]
+        public void NamedGroup_Expression()
+        {
+            var p = Pattern.NamedGroup("year", Pattern.Digit().Repeat(4));
+            Assert.Equal(@"(?<year>\d{4})", (string)p);
+            Assert.Equal("year", p.Name);
+        }
+
+        [Fact]
+        public void NamedGroup_CanExtract()
+        {
+            var year = Pattern.NamedGroup("year", Pattern.Digit().Repeat(4));
+            var match = year.Match("Year: 2025");
+            Assert.True(match.Success);
+            Assert.Equal("2025", match.Groups["year"].Value);
+        }
+
+        [Fact]
+        public void NamedGroup_EmptyName_Throws()
+        {
+            Assert.Throws<ArgumentException>(() => Pattern.NamedGroup("", Pattern.Digit()));
+        }
+
+        [Fact]
+        public void NamedGroup_InComplexPattern()
+        {
+            var date = Pattern.NamedGroup("day", Pattern.Digit().Repeat(2)) +
+                       Pattern.Literal("/") +
+                       Pattern.NamedGroup("month", Pattern.Digit().Repeat(2)) +
+                       Pattern.Literal("/") +
+                       Pattern.NamedGroup("year", Pattern.Digit().Repeat(4));
+
+            var match = date.Match("Date: 15/06/2025 end");
+            Assert.True(match.Success);
+            Assert.Equal("15", match.Groups["day"].Value);
+            Assert.Equal("06", match.Groups["month"].Value);
+            Assert.Equal("2025", match.Groups["year"].Value);
+        }
+    }
+
+    public class AnchorTests
+    {
+        [Fact]
+        public void StartAndEnd_Expression()
+        {
+            Assert.Equal("^", (string)Pattern.Start());
+            Assert.Equal("$", (string)Pattern.End());
+        }
+
+        [Fact]
+        public void Start_MatchesAtBeginning()
+        {
+            var p = Pattern.Start() + Pattern.Literal("hello");
+            Assert.True(p.ContainsMatch("hello world"));
+            Assert.False(p.ContainsMatch("say hello"));
+        }
+
+        [Fact]
+        public void End_MatchesAtEnd()
+        {
+            var p = Pattern.Literal("world") + Pattern.End();
+            Assert.True(p.ContainsMatch("hello world"));
+            Assert.False(p.ContainsMatch("world peace"));
+        }
+
+        [Fact]
+        public void StartAndEnd_FullString()
+        {
+            var p = Pattern.Start() + Pattern.Digit().OneOrMore() + Pattern.End();
+            Assert.True(p.ContainsMatch("12345"));
+            Assert.False(p.ContainsMatch("abc 123"));
+        }
+
+        [Fact]
+        public void WordBoundary_Expression()
+        {
+            Assert.Equal(@"\b", (string)Pattern.WordBoundary());
+            Assert.Equal(@"\B", (string)Pattern.NotWordBoundary());
+        }
+
+        [Fact]
+        public void WordBoundary_IsolatesWords()
+        {
+            var p = Pattern.WordBoundary() + Pattern.Literal("cat") + Pattern.WordBoundary();
+            Assert.True(p.ContainsMatch("the cat sat"));
+            Assert.False(p.ContainsMatch("the caterpillar sat"));
+        }
+
+        [Fact]
+        public void WordBoundary_DoesNotMatchInsideWord()
+        {
+            var p = Pattern.WordBoundary() + Pattern.Literal("at") + Pattern.WordBoundary();
+            Assert.True(p.ContainsMatch("cat at dog"));
+            Assert.False(p.ContainsMatch("cat dog"));
+        }
+
+        [Fact]
+        public void NotWordBoundary_MatchesInsideWord()
+        {
+            var p = Pattern.NotWordBoundary() + Pattern.Literal("at") + Pattern.NotWordBoundary();
+            Assert.True(p.ContainsMatch("caterpillar"));
+            Assert.False(p.ContainsMatch("cat dog"));
+        }
+    }
+
+    public class LookaroundTests
+    {
+        [Fact]
+        public void LookAhead_Expression()
+        {
+            var p = Pattern.Digit().Repeat(3) + Pattern.LookAhead(Pattern.End());
+            Assert.Equal(@"\d{3}(?=$)", (string)p);
+        }
+
+        [Fact]
+        public void LookAhead_Positive()
+        {
+            var p = Pattern.Literal("foo") + Pattern.LookAhead(Pattern.Literal("bar"));
+            Assert.True(p.ContainsMatch("foobar"));
+            Assert.False(p.ContainsMatch("foobaz"));
+        }
+
+        [Fact]
+        public void LookAheadNot_Expression()
+        {
+            var p = Pattern.Digit().OneOrMore() + Pattern.LookAheadNot(Pattern.Literal("0"));
+            Assert.Equal(@"\d+(?!0)", (string)p);
+        }
+
+        [Fact]
+        public void LookAheadNot_Negative()
+        {
+            var p = Pattern.Digit().OneOrMore() + Pattern.LookAheadNot(Pattern.Digit());
+            var match = p.Match("abc 123 def");
+            Assert.True(match.Success);
+            Assert.Equal("123", match.Value);
+        }
+
+        [Fact]
+        public void LookBehind_Positive()
+        {
+            var p = Pattern.LookBehind(Pattern.Literal("foo")) + Pattern.Literal("bar");
+            Assert.True(p.ContainsMatch("foobar"));
+            Assert.False(p.ContainsMatch("bazbar"));
+        }
+
+        [Fact]
+        public void LookBehind_Expression()
+        {
+            var p = Pattern.LookBehind(Pattern.Literal("$")) + Pattern.Digit().Repeat(2);
+            Assert.Equal(@"(?<=\$)\d{2}", (string)p);
+        }
+
+        [Fact]
+        public void LookBehindNot_Negative()
+        {
+            var p = Pattern.LookBehindNot(Pattern.Digit()) + Pattern.Literal("x");
+            Assert.True(p.ContainsMatch("abcx"));
+            Assert.False(p.ContainsMatch("123x"));
+        }
+
+        [Fact]
+        public void LookBehindNot_Expression()
+        {
+            var p = Pattern.LookBehindNot(Pattern.Digit());
+            Assert.Equal(@"(?<!\d)", (string)p);
+        }
+
+        [Fact]
+        public void Lookaround_PasswordValidation()
+        {
+            var isolatedDigit = Pattern.LookBehindNot(Pattern.Digit()) +
+                                 Pattern.Digit() +
+                                 Pattern.LookAheadNot(Pattern.Digit());
+
+            Assert.True(isolatedDigit.ContainsMatch("a1b"));
+            Assert.False(isolatedDigit.ContainsMatch("123"));
+        }
+
+        [Fact]
+        public void LookAround_SameAsNegationOperator()
+        {
+            var lookAheadNot = Pattern.LookAheadNot(Pattern.Literal("spam"));
+            var negation = !Pattern.Literal("spam");
+            Assert.Equal((string)lookAheadNot, (string)negation);
+        }
+
+        [Fact]
+        public void LookAround_PrecedenceIsAtomic()
+        {
+            var p = Pattern.LookAhead(Pattern.Literal("x")).OneOrMore();
+            Assert.Equal(@"(?=x)+", (string)p);
+        }
+
+
+    }
 }
