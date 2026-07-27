@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FluentRegex.Core.Patterns
+﻿namespace FluentRegex.Core.Patterns
 {
     /// <summary>
     /// A pattern that matches any whitespace character (spaces, tabs, newlines), equivalent to \s in regex.
