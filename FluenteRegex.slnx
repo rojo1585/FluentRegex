@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="src/FluentRegex.Core/FluentRegex.Core.csproj" Id="2c6ee4e9-c159-4487-9c3b-e0c56eb54436" />
+  <Project Path="tests/FluentRegex.Core.Tests/FluentRegex.Core.Tests.csproj" Id="88e9a3c1-f164-4215-9438-77c8cd7dced7" />
 </Solution>

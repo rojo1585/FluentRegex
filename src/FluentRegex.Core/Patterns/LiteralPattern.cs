@@ -15,6 +15,19 @@ namespace FluentRegex.Core.Patterns
         public override string Expression { get; }
 
         /// <summary>
+        /// Precedence is 3 (atomic) only for single-atom expressions:
+        /// a single character ("a") or a single escape sequence ("\d", "\.").
+        /// Multi-character literals ("ab", "\+52") have precedence 1 (concatenation)
+        /// so that quantifiers correctly wrap the whole literal.
+        /// </summary>
+        internal override int Precedence => Expression.Length switch
+        {
+            1 => 3,
+            2 when Expression[0] == '\\' => 3,
+            _ => 1
+        };
+
+        /// <summary>
         /// Creates a new literal pattern from the specified string.
         /// Special regex characters (e.g. ., *, +, ?, [, (, etc.) are automatically escaped.
         /// </summary>

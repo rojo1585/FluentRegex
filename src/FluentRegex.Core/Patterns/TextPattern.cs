@@ -14,6 +14,12 @@ namespace FluentRegex.Core.Patterns
         /// <inheritdoc />
         public override string Expression { get; }
 
+        /// <summary>
+        /// TextPattern expressions include a quantifier (e.g. "[a-zA-Z]+").
+        /// Precedence 1 (concatenation) ensures correct grouping when composed.
+        /// </summary>
+        internal override int Precedence => 1;
+
         private readonly int? _minLength;
         private readonly int? _maxLength;
         private readonly bool _allowDigits;
@@ -22,7 +28,11 @@ namespace FluentRegex.Core.Patterns
         /// <summary>
         /// Creates a new TextPattern with the specified configuration.
         /// </summary>
-        internal TextPattern(int? minLength = null, int? maxLength = null, bool allowDigits = false, char[]? extraChars = null)
+        internal TextPattern(
+            int? minLength = null,
+            int? maxLength = null,
+            bool allowDigits = false,
+            char[]? extraChars = null)
         {
             if (minLength.HasValue && minLength.Value < 0)
                 throw new ArgumentOutOfRangeException(nameof(minLength), "MinLength must be non-negative.");
