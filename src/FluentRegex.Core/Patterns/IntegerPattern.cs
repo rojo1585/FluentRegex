@@ -4,6 +4,7 @@ using System.Text;
 
 namespace FluentRegex.Core.Patterns
 {
+
     /// <summary>
     /// A pattern that matches integer numbers.
     /// By default matches one or more digits (0-9). Optionally allows a sign (+ or -).
@@ -13,6 +14,12 @@ namespace FluentRegex.Core.Patterns
         /// <inheritdoc />
         public override string Expression { get; }
 
+        /// <summary>
+        /// IntegerPattern expressions include quantifiers (e.g. "\d+", "-?\d+").
+        /// Precedence 1 (concatenation) ensures correct grouping when composed.
+        /// </summary>
+        internal override int Precedence => 1;
+
         private readonly bool _allowNegative;
         private readonly bool _allowSign;
         private readonly int? _minDigits;
@@ -21,7 +28,11 @@ namespace FluentRegex.Core.Patterns
         /// <summary>
         /// Creates a new IntegerPattern with the specified configuration.
         /// </summary>
-        internal IntegerPattern(bool allowNegative = false, bool allowSign = false, int? minDigits = null, int? maxDigits = null)
+        internal IntegerPattern(
+            bool allowNegative = false,
+            bool allowSign = false,
+            int? minDigits = null,
+            int? maxDigits = null)
         {
             if (minDigits.HasValue && minDigits.Value < 0)
                 throw new ArgumentOutOfRangeException(nameof(minDigits), "MinDigits must be non-negative.");

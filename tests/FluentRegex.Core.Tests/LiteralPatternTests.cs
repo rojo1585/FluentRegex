@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FluentRegex.Core;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -292,16 +293,26 @@ public class UsageMethodTests
     {
         var pattern = Pattern.Digit().Repeat(3);
         Assert.True(pattern.IsMatch("123"));
-        Assert.False(pattern.IsMatch("1234"));
-        Assert.False(pattern.IsMatch("a123"));
+        Assert.False(pattern.IsMatch("1234")); // extra digit — not a full match
+        Assert.False(pattern.IsMatch("a123")); // extra char before — not a full match
     }
+
     [Fact]
     public void ContainsMatch_IsPartialMatch()
     {
         var pattern = Pattern.Letter();
-        Assert.True(pattern.ContainsMatch("ab"));
-        Assert.True(pattern.ContainsMatch("123a"));
-        Assert.False(pattern.ContainsMatch("123"));
+        Assert.True(pattern.ContainsMatch("ab"));    // finds 'a' inside "ab"
+        Assert.True(pattern.ContainsMatch("123a"));  // finds 'a' inside "123a"
+        Assert.False(pattern.ContainsMatch("123"));  // no letter found
+    }
+
+    [Fact]
+    public void Match_ReturnsFirstMatch()
+    {
+        var pattern = Pattern.Digit().OneOrMore();
+        var match = pattern.Match("abc 123 def 456");
+        Assert.True(match.Success);
+        Assert.Equal("123", match.Value);
     }
 
     [Fact]
@@ -540,126 +551,122 @@ public class ComplexPatternTests
         Assert.True(protocol.IsMatch("ftp"));
         Assert.False(protocol.IsMatch("ssh"));
     }
-    public class PrecedenceTests
+}
+
+public class PrecedenceTests
+{
+    // --- Concat + Alternation ---
+
+    [Fact]
+    public void Concat_WrapsAlternation_Left()
     {
-        // --- Concat + Alternation ---
+        var p = (Pattern.Literal("cat") | Pattern.Literal("dog")) + Pattern.Literal("s");
+        Assert.Equal("(?:cat|dog)s", (string)p);
+        Assert.True(p.IsMatch("cats"));
+        Assert.True(p.IsMatch("dogs"));
+        Assert.False(p.IsMatch("cat"));
+        Assert.False(p.IsMatch("dog"));
+    }
 
-        [Fact]
-        public void Concat_WrapsAlternation_Left()
-        {
-            var p = (Pattern.Literal("cat") | Pattern.Literal("dog")) + Pattern.Literal("s");
-            Assert.Equal("(?:cat|dog)s", (string)p);
-            Assert.True(p.IsMatch("cats"));
-            Assert.True(p.IsMatch("dogs"));
-            Assert.False(p.IsMatch("cat"));
-           Assert.False(p.IsMatch("dog"));
-        }
+    [Fact]
+    public void Concat_WrapsAlternation_Right()
+    {
+        var p = Pattern.Literal("s") + (Pattern.Literal("cat") | Pattern.Literal("dog"));
+        Assert.Equal("s(?:cat|dog)", (string)p);
+        Assert.True(p.IsMatch("scat"));
+        Assert.True(p.IsMatch("sdog"));
+        Assert.False(p.IsMatch("scatdog"));
+    }
 
-        [Fact]
-        public void Concat_WrapsAlternation_Right()
-        {
-            var p = Pattern.Literal("s") + (Pattern.Literal("cat") | Pattern.Literal("dog"));
-            Assert.Equal("s(?:cat|dog)", (string)p);
-            Assert.True(p.IsMatch("scat"));
-            Assert.True(p.IsMatch("sdog"));
-            Assert.False(p.IsMatch("scatdog"));
-        }
+    [Fact]
+    public void Concat_WrapsAlternation_Both()
+    {
+        var p = (Pattern.Literal("big") | Pattern.Literal("small")) +
+                Pattern.Literal(" ") +
+                (Pattern.Literal("cat") | Pattern.Literal("dog"));
+        Assert.Equal(@"(?:big|small) (?:cat|dog)", (string)p);
+    }
 
-        [Fact]
-        public void Concat_WrapsAlternation_Both()
-        {
-            var p = (Pattern.Literal("big") | Pattern.Literal("small")) +
-                    Pattern.Literal(" ") +
-                    (Pattern.Literal("cat") | Pattern.Literal("dog"));
-            Assert.Equal(@"(?:big|small)\ (??:cat|dog)", (string)p);
-        }
+    // --- Quantifier + Alternation ---
 
-        // --- Quantifier + Alternation ---
+    [Fact]
+    public void Quantifier_WrapsAlternation()
+    {
+        var p = (Pattern.Literal("a") | Pattern.Literal("b")).OneOrMore();
+        Assert.Equal("(?:a|b)+", (string)p);
+        Assert.True(p.IsMatch("ab"));
+        Assert.True(p.IsMatch("aaa"));
+        Assert.True(p.IsMatch("bbb"));
+        Assert.False(p.IsMatch(""));
+        Assert.False(p.IsMatch("ac"));
+    }
 
-        [Fact]
-        public void Quantifier_WrapsAlternation()
-        {
-            var p = (Pattern.Literal("a") | Pattern.Literal("b")).OneOrMore();
-            Assert.Equal("(?:a|b)+", (string)p);
-            Assert.True(p.IsMatch("ab"));
-            Assert.True(p.IsMatch("aaa"));
-            Assert.True(p.IsMatch("bbb"));
-            Assert.False(p.IsMatch(""));
-            Assert.False(p.IsMatch("ac"));
-        }
+    // --- Quantifier + Concatenation ---
 
-        // --- Quantifier + Concatenation ---
+    [Fact]
+    public void Quantifier_WrapsConcatenation()
+    {
+        var p = (Pattern.Literal("a") + Pattern.Literal("b")).OneOrMore();
+        Assert.Equal("(?:ab)+", (string)p);
+        Assert.True(p.IsMatch("ab"));
+        Assert.True(p.IsMatch("abab"));
+        Assert.False(p.IsMatch("aabb"));
+        Assert.False(p.IsMatch("a"));
+    }
 
-        [Fact]
-        public void Quantifier_WrapsConcatenation()
-        {
-            var p = (Pattern.Literal("a") + Pattern.Literal("b")).OneOrMore();
-            Assert.Equal("(?:ab)+", (string)p);
-            Assert.True(p.IsMatch("ab"));
-            Assert.True(p.IsMatch("abab"));
-            Assert.False(p.IsMatch("aabb"));
-            Assert.False(p.IsMatch("a"));
-        }
+    // --- No unnecessary wrapping ---
 
-        // --- No unnecessary wrapping ---
+    [Fact]
+    public void Concat_DoesNotWrapAtom()
+    {
+        var p = Pattern.Literal("hello") + Pattern.Literal(" ") + Pattern.Literal("world");
+        Assert.Equal(@"hello world", (string)p);
+    }
 
-        [Fact]
-        public void Concat_DoesNotWrapAtom()
-        {
-            var p = Pattern.Literal("hello") + Pattern.Literal(" ") + Pattern.Literal("world");
-            Assert.Equal(@"hello\ world", (string)p);
-        }
+    [Fact]
+    public void Quantifier_DoesNotWrapAtom()
+    {
+        var p = Pattern.Digit().OneOrMore();
+        Assert.Equal(@"\d+", (string)p);
 
-        [Fact]
-        public void Quantifier_DoesNotWrapAtom()
-        {
-            var p = Pattern.Digit().OneOrMore();
-            Assert.Equal(@"\d+", (string)p);
+        var q = Pattern.Letter().Repeat(3);
+        Assert.Equal("[a-zA-Z]{3}", (string)q);
+    }
 
-            var q = Pattern.Letter().Repeat(3);
-            Assert.Equal("[a-zA-Z]{3}", (string)q);
-        }
+    [Fact]
+    public void Quantifier_DoesNotWrapQuantified()
+    {
+        var p = Pattern.AnyChar().OneOrMore().Optional();
+        Assert.Equal("(?:.+)?", (string)p);
+    }
 
-        [Fact]
-        public void Quantifier_DoesNotWrapQuantified()
-        {
-            // \.+ is valid: the inner QuantifiedPattern (precedence 2) >= 2, no wrap
-            var p = Pattern.AnyChar().OneOrMore().Optional();
-            Assert.Equal(".??", (string)p);
-        }
+    [Fact]
+    public void Concat_DoesNotWrapQuantified()
+    {
+        var p = Pattern.Literal("a").OneOrMore() + Pattern.Literal("b");
+        Assert.Equal("a+b", (string)p);
+    }
 
-        [Fact]
-        public void Concat_DoesNotWrapQuantified()
-        {
-            // a+b is valid: QuantifiedPattern (precedence 2) >= 1, no wrap
-            var p = Pattern.Literal("a").OneOrMore() + Pattern.Literal("b");
-            Assert.Equal("a+b", (string)p);
-        }
+    [Fact]
+    public void Complex_AlternationConcatQuantifier()
+    {
+        var inner = (Pattern.Literal("a") | Pattern.Literal("b")) + Pattern.Literal("c");
+        var p = inner.OneOrMore();
+        Assert.Equal("(?:(?:a|b)c)+", (string)p);
+        Assert.True(p.IsMatch("acbc"));
+        Assert.True(p.IsMatch("ac"));
+        Assert.False(p.IsMatch("a"));
+    }
 
-        // --- Complex combinations ---
-
-        [Fact]
-        public void Complex_AlternationConcatQuantifier()
-        {
-            // ((a|b)c)+ should produce (?:(?:a|b)c)+
-            var inner = (Pattern.Literal("a") | Pattern.Literal("b")) + Pattern.Literal("c");
-            var p = inner.OneOrMore();
-            Assert.Equal("(?:(?:a|b)c)+", (string)p);
-            Assert.True(p.IsMatch("acbc"));
-            Assert.True(p.IsMatch("ac"));
-            Assert.False(p.IsMatch("a"));
-        }
-
-        [Fact]
-        public void Complex_PhoneWithOptionalCode()
-        {
-            var code = Pattern.Literal("+52").Optional();
-            var digits = Pattern.Digit().Repeat(10);
-            var phone = code + digits;
-            Assert.Equal(@"\+52?\d{10}", (string)phone);
-            Assert.True(phone.IsMatch("5512345678"));
-            Assert.True(phone.IsMatch("+525512345678"));
-            Assert.False(phone.IsMatch("123"));
-        }
+    [Fact]
+    public void Complex_PhoneWithOptionalCode()
+    {
+        var code = Pattern.Literal("+52").Optional();
+        var digits = Pattern.Digit().Repeat(10);
+        var phone = code + digits;
+        Assert.Equal(@"(?:\+52)?\d{10}", (string)phone);
+        Assert.True(phone.IsMatch("5512345678"));
+        Assert.True(phone.IsMatch("+525512345678"));
+        Assert.False(phone.IsMatch("123"));
     }
 }
