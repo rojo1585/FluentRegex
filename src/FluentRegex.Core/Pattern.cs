@@ -236,6 +236,23 @@ namespace FluentRegex.Core
         /// Creates a pattern that matches integer numbers.
         /// </summary>
         public static IntegerPattern Integer() => new();
+        #region Static Factory Methods — Backreferences
+
+        /// <summary>
+        /// Creates a named backreference (<c>\k&lt;name&gt;</c>) that matches the same text
+        /// previously captured by the named group.
+        /// </summary>
+        /// <param name="name">The name of the group to reference.</param>
+        public static BackreferencePattern Backreference(string name) => new(name);
+
+        /// <summary>
+        /// Creates a numbered backreference (<c>\1</c>, <c>\2</c>, etc.) that matches the same text
+        /// previously captured by the group at that position (1-based).
+        /// </summary>
+        /// <param name="number">The 1-based group number to reference.</param>
+        public static BackreferencePattern Backreference(int number) => new(number);
+
+        #endregion
 
         #region Static Factory Methods — Groups
 
