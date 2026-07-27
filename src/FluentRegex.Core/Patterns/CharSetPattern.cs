@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FluentRegex.Core.Patterns
+﻿namespace FluentRegex.Core.Patterns
 {
     /// <summary>
     /// A pattern that matches characters within a set or range, e.g. [abc] or [a-z] or [^abc].

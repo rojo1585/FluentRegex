@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FluentRegex.Core.Internal
+﻿namespace FluentRegex.Core.Internal
 {
     /// <summary>
     /// Internal pattern that negates another pattern using a negative lookahead.

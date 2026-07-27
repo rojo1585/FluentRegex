@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FluentRegex.Core.Internal
+﻿namespace FluentRegex.Core.Internal
 {
     /// <summary>
     /// Internal pattern that represents the concatenation of two patterns (side by side).
     /// Created by the + operator.
-    /// /// Automatically groups operands with lower precedence (e.g. alternations).
+    /// Automatically groups operands with lower precedence (e.g. alternations).
     /// </summary>
     internal sealed class ConcatPattern : Pattern
     {

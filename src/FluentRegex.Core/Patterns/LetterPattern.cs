@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FluentRegex.Core.Patterns
+﻿namespace FluentRegex.Core.Patterns
 {
     /// <summary>
     /// A pattern that matches a single ASCII letter (a-z or A-Z), equivalent to [a-zA-Z] in regex.
