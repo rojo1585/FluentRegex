@@ -729,7 +729,7 @@ public class PrecedenceTests
         [Theory]
         [InlineData("year")]
         [InlineData("_private")]
-        [InlineData("group1")]
+        [InlineData("grou>p1")]
         [InlineData("CamelCase")]
         [InlineData("snake_case")]
         [InlineData("_")]

@@ -1,4 +1,5 @@
 ﻿using FluentRegex.Core.Internal;
+using FluentRegex.Core.Literals;
 using FluentRegex.Core.Patterns;
 using System.Text.RegularExpressions;
 
@@ -291,7 +292,7 @@ namespace FluentRegex.Core
         public static LookaroundPattern LookAhead(Pattern inner)
         {
             ArgumentNullException.ThrowIfNull(inner);
-            return new LookaroundPattern("?=", inner);
+            return new LookaroundPattern(LookaroundKind.PositiveLookahead, inner);
         }
 
         /// <summary>
@@ -300,7 +301,7 @@ namespace FluentRegex.Core
         public static LookaroundPattern LookAheadNot(Pattern inner)
         {
             ArgumentNullException.ThrowIfNull(inner);
-            return new LookaroundPattern("?!", inner);
+            return new LookaroundPattern(LookaroundKind.NegativeLookahead, inner);
         }
 
         /// <summary>
@@ -309,7 +310,7 @@ namespace FluentRegex.Core
         public static LookaroundPattern LookBehind(Pattern inner)
         {
             ArgumentNullException.ThrowIfNull(inner);
-            return new LookaroundPattern("?<=", inner);
+            return new LookaroundPattern(LookaroundKind.PositiveLookbehind, inner);
         }
 
         /// <summary>
@@ -318,7 +319,7 @@ namespace FluentRegex.Core
         public static LookaroundPattern LookBehindNot(Pattern inner)
         {
             ArgumentNullException.ThrowIfNull(inner);
-            return new LookaroundPattern("?<!", inner);
+            return new LookaroundPattern(LookaroundKind.NegativeLookbehind, inner);
         }
 
         #endregion
