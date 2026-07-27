@@ -153,21 +153,25 @@ namespace FluentRegex.Core
         public bool ContainsMatch(string input) => Regex.IsMatch(input, Expression);
         /// <summary>
         ///Searches the input string for all occurrences of the pattern(partial match).
+        /// Does not add anchors.
         /// </summary>
         public Match Match(string input) => Regex.Match(input, Expression);
 
         /// <summary>
         /// Searches the input string for all occurrences of the pattern.
+        /// Does not add anchors.
         /// </summary>
         public MatchCollection Matches(string input) => Regex.Matches(input, Expression);
 
         /// <summary>
         /// Replaces all occurrences of the pattern in the input string with the replacement string.
+        /// Does not add anchors.
         /// </summary>
         public string Replace(string input, string replacement) => Regex.Replace(input, Expression, replacement);
 
         /// <summary>
         /// Splits the input string at each occurrence of the pattern.
+        /// Does not add anchors.
         /// </summary>
         public string[] Split(string input) => [.. Regex.Split(input, Expression)];
 
@@ -181,7 +185,7 @@ namespace FluentRegex.Core
 
 
 
-       
+
         /// <summary>
         /// Creates a pattern that matches any whitespace character (equivalent to \s).
         /// </summary>
@@ -221,7 +225,7 @@ namespace FluentRegex.Core
         /// Creates a pattern that matches a single digit (equivalent to \d).
         /// </summary>
         public static DigitPattern Digit() => new();
-         /// <summary>
+        /// <summary>
         /// Creates a pattern that matches a single letter a-z or A-Z.
         /// </summary>
         public static LetterPattern Letter() => new();
