@@ -920,10 +920,15 @@ public class PrecedenceTests
         [Fact]
         public void LookAround_PrecedenceIsAtomic()
         {
-            var p = Pattern.LookAhead(Pattern.Literal("x")).OneOrMore();
-            Assert.Equal(@"(?=x)+", (string)p);
+            var ex = Assert.Throws<InvalidOperationException>(() => Pattern.LookAhead(Pattern.Literal("x")).OneOrMore());
+            Assert.Contains("zero-width", ex.Message);
         }
-
+        [Fact]
+        public void LookAround_CanBeConcatenatedWithoutWrapping()
+        {
+            var p = Pattern.Literal("foo") + Pattern.LookAhead(Pattern.Literal("bar"));
+            Assert.Equal(@"foo(?=bar)", (string)p);
+        }
 
     }
 }

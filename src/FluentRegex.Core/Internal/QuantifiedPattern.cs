@@ -13,6 +13,11 @@
 
         internal QuantifiedPattern(Pattern inner, string quantifier)
         {
+            if (inner.IsZeroWidth)
+                throw new InvalidOperationException($"Cannot quantify a zero-width assertion. The pattern '{inner.Expression}' does not consume characters, "
+                                                    + $"so applying '{quantifier}' is meaningless. "
+                                                    + $"Remove the quantifier or use a pattern that consumes characters.");
+
             Expression = $"{inner.WrapIfBelow(3)}{quantifier}";
         }
     }

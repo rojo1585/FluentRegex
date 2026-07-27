@@ -24,6 +24,13 @@ namespace FluentRegex.Core
         /// </para>
         /// </summary>
         internal virtual int Precedence => 3;
+
+        /// <summary>
+        /// Indicates whether this pattern is a zero-width assertion (anchor, lookaround).
+        /// Zero-width patterns do not consume input characters and should not be quantified.
+        /// </summary>
+        internal virtual bool IsZeroWidth => false;
+
         /// <summary>
         /// Returns the expression wrapped in a non-capturing group
         /// if this pattern's precedence is below <paramref name="minPrecedence"/>.

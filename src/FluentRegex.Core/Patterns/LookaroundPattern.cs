@@ -16,7 +16,7 @@ namespace FluentRegex.Core.Patterns
     {
         public override string Expression { get; }
         internal override int Precedence => 3;
-
+        internal override bool IsZeroWidth => true;
         internal LookaroundPattern(string lookaroundType, Pattern inner)
         {
             Expression = $"({lookaroundType}{inner.Expression})";
