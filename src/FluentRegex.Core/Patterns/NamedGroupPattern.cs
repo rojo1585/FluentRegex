@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FluentRegex.Core.Patterns
@@ -12,6 +13,9 @@ namespace FluentRegex.Core.Patterns
     /// </summary>
     public sealed class NamedGroupPattern : Pattern
     {
+        private static readonly Regex ValidGroupName = new("^[A-Za-z_][A-Za-z0-9_]*$",
+        RegexOptions.Compiled, TimeSpan.FromSeconds(1));
+
         /// <inheritdoc />
         public override string Expression { get; }
 
@@ -24,8 +28,10 @@ namespace FluentRegex.Core.Patterns
 
         internal NamedGroupPattern(string name, Pattern inner)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Group name cannot be empty.", nameof(name));
+            ArgumentNullException.ThrowIfNull(name);
+
+            if (name.Length == 0 || !ValidGroupName.IsMatch(name))
+                throw new ArgumentException(@"Group name must start with a letter or underscore, followed by letters, digits, or underscores. Examples: 'year', '_temp', 'group1'.", nameof(name));
 
             Name = name;
             Expression = $"(?<{name}>{inner.Expression})";

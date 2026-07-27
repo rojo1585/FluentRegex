@@ -720,7 +720,39 @@ public class PrecedenceTests
         {
             Assert.Throws<ArgumentException>(() => Pattern.NamedGroup("", Pattern.Digit()));
         }
+        [Theory]
+        [InlineData("my-group")]
+        [InlineData("first name")]
+        [InlineData("year!")]
+        [InlineData("1year")]
+        [InlineData("-start")]
+        [InlineData("@tag")]
+        [InlineData(" ")]
+        public void NamedGroup_InvalidName_Throws(string invalidName)
+        {
+            var ex = Assert.Throws<ArgumentException>(() => Pattern.NamedGroup(invalidName, Pattern.Digit()));
+            Assert.Equal("name", ex.ParamName);
+        }
 
+        [Theory]
+        [InlineData("year")]
+        [InlineData("_private")]
+        [InlineData("group1")]
+        [InlineData("CamelCase")]
+        [InlineData("snake_case")]
+        [InlineData("_")]
+        [InlineData("a")]
+        [InlineData("ABC123")]
+        public void NamedGroup_ValidName_Accepted(string validName)
+        {
+            var p = Pattern.NamedGroup(validName, Pattern.Digit());
+            Assert.Equal(@$"(?<{validName}>\d)", (string)p);
+        }
+        [Fact]
+        public void NamedGroup_NullName_Throws()
+        {
+            Assert.Throws<ArgumentNullException>(() => Pattern.NamedGroup(null!, Pattern.Digit()));
+        }
         [Fact]
         public void NamedGroup_InComplexPattern()
         {
