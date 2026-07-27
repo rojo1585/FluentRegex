@@ -9,7 +9,8 @@ namespace FluentRegex.Core.Patterns
 
     /// <summary>
     /// Wraps a pattern in a non-capturing group (?:...).
-    /// Groups are atomic (precedence 3) since they're already self-contained.
+    /// Use this for grouping by precedence without capturing.
+    /// For capturing, use <see cref="NamedGroup"/> instead.
     /// </summary>
     public sealed class GroupPattern : Pattern
     {
