@@ -130,12 +130,17 @@ namespace FluentRegex.Core
         public static implicit operator string(Pattern pattern) => pattern.Expression;
 
         /// <summary>
-        /// Indicates whether the specified input string matches the pattern.
+        /// Indicates whether the entire input string matches the pattern (full match).
+        /// Wraps the expression in <c>^(?:...)$</c> for validation semantics.
         /// </summary>
-        public bool IsMatch(string input) => Regex.IsMatch(input, Expression);
-
+        public bool IsMatch(string input) => Regex.IsMatch(input, $"^(?:{Expression})$");
         /// <summary>
-        /// Searches the input string for the first occurrence of the pattern.
+        /// Indicates whether the input string contains a match for the pattern (partial match).
+        /// Use this when you need to search within a larger string.
+        /// </summary>
+        public bool ContainsMatch(string input) => Regex.IsMatch(input, Expression);
+        /// <summary>
+        ///Searches the input string for all occurrences of the pattern(partial match).
         /// </summary>
         public Match Match(string input) => Regex.Match(input, Expression);
 
