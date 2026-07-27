@@ -23,8 +23,39 @@ namespace FluentRegex.Core.Patterns
         public LiteralPattern(string value)
         {
             ArgumentNullException.ThrowIfNull(value);
-            Expression = Regex.Escape(value);
+            Expression = EscapeLiteral(value);
         }
+
+        /// <summary>
+        /// Escapes only the true regex metacharacters.
+        /// Unlike <see cref="Regex.Escape"/>, this does NOT
+        /// escape spaces or <c>#</c> (which <c>Regex.Escape</c> does for
+        /// <see cref="RegexOptions.IgnorePatternWhitespace"/> safety).
+        /// </summary>
+        internal static string EscapeLiteral(string value)
+        {
+            if (value.Length == 0)
+                return value;
+
+            var sb = new System.Text.StringBuilder(value.Length);
+
+            foreach (var c in value)
+            {
+                if (IsRegexMetachar(c))
+                    sb.Append('\\').Append(c);
+                else
+                    sb.Append(c);
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Returns true for characters that have special meaning in regex.
+        /// </summary>
+        private static bool IsRegexMetachar(char c) => c is
+            '\\' or '.' or '$' or '^' or '{' or '[' or '(' or
+            '|' or ')' or '*' or '+' or '?';
     }
 
 }
