@@ -29,7 +29,7 @@ namespace FluentRegex.Core.Patterns
         /// </summary>
         public int? Number { get; }
 
-        internal override int Precedence => 3;
+       protected internal override int Precedence => 3;
 
         internal BackreferencePattern(string name)
         {

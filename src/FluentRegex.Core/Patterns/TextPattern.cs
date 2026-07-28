@@ -14,7 +14,7 @@
         /// TextPattern expressions include a quantifier (e.g. "[a-zA-Z]+").
         /// Precedence 1 (concatenation) ensures correct grouping when composed.
         /// </summary>
-        internal override int Precedence => 1;
+        protected internal override int Precedence => 1;
 
         private readonly int? _minLength;
         private readonly int? _maxLength;

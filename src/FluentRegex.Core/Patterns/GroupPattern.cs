@@ -17,7 +17,7 @@ namespace FluentRegex.Core.Patterns
         /// <inheritdoc />
         public override string Expression { get; }
 
-        internal override int Precedence => 3;
+        protected internal override int Precedence => 3;
 
         internal GroupPattern(Pattern inner)
         {

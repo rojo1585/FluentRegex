@@ -25,9 +25,9 @@ namespace FluentRegex.Core.Patterns
         /// </summary>
         internal LookaroundKind Kind { get; }
 
-        internal override int Precedence => 3;
+        protected internal override int Precedence => 3;
 
-        internal override bool IsZeroWidth => true;
+        protected internal override bool IsZeroWidth => true;
 
         internal LookaroundPattern(LookaroundKind kind, Pattern inner)
         {

@@ -14,7 +14,7 @@
         /// IntegerPattern expressions include quantifiers (e.g. "\d+", "-?\d+").
         /// Precedence 1 (concatenation) ensures correct grouping when composed.
         /// </summary>
-        internal override int Precedence => 1;
+       protected internal override int Precedence => 1;
 
         private readonly bool _allowNegative;
         private readonly bool _allowSign;

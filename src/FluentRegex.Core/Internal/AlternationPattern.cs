@@ -7,7 +7,7 @@
     internal sealed class AlternationPattern : Pattern
     {
         public override string Expression { get; }
-        internal override int Precedence => 0;
+        protected internal override int Precedence => 0;
 
         internal AlternationPattern(Pattern left, Pattern right)
         {

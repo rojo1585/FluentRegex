@@ -8,7 +8,7 @@
     internal sealed class ConcatPattern : Pattern
     {
         public override string Expression { get; }
-        internal override int Precedence => 1;
+        protected internal override int Precedence => 1;
 
         internal ConcatPattern(Pattern left, Pattern right)
         {

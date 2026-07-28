@@ -24,7 +24,7 @@ namespace FluentRegex.Core.Patterns
         /// </summary>
         public string Name { get; }
 
-        internal override int Precedence => 3;
+       protected internal override int Precedence => 3;
 
         internal NamedGroupPattern(string name, Pattern inner)
         {
