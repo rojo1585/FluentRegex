@@ -1,10 +1,4 @@
-﻿using FluentRegex.Core;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-
-namespace FluentRegex.Core.Tests;
+﻿namespace FluentRegex.Core.Tests;
 
 public class LiteralPatternTests
 {
