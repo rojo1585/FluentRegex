@@ -16,9 +16,8 @@ namespace FluentRegex.Core.Patterns
     {
         /// <inheritdoc />
         public override string Expression { get; }
-
         internal override int Precedence => 3;
-
+        internal override bool IsZeroWidth => true;
         internal AnchorPattern(string expression)
         {
             Expression = expression;

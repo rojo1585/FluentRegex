@@ -1,4 +1,5 @@
 ﻿using FluentRegex.Core.Internal;
+using FluentRegex.Core.Literals;
 using FluentRegex.Core.Patterns;
 using System.Text.RegularExpressions;
 
@@ -24,6 +25,13 @@ namespace FluentRegex.Core
         /// </para>
         /// </summary>
         internal virtual int Precedence => 3;
+
+        /// <summary>
+        /// Indicates whether this pattern is a zero-width assertion (anchor, lookaround).
+        /// Zero-width patterns do not consume input characters and should not be quantified.
+        /// </summary>
+        internal virtual bool IsZeroWidth => false;
+
         /// <summary>
         /// Returns the expression wrapped in a non-capturing group
         /// if this pattern's precedence is below <paramref name="minPrecedence"/>.
@@ -121,17 +129,6 @@ namespace FluentRegex.Core
         }
 
         /// <summary>
-        /// Negation: wraps the pattern as a negative lookahead or character class negation
-        /// depending on the pattern type.
-        /// </summary>
-        public static Pattern operator !(Pattern pattern)
-        {
-            ArgumentNullException.ThrowIfNull(pattern);
-            return new NegationPattern(pattern);
-        }
-
-
-        /// <summary>
         /// Implicitly converts a Pattern to a <see cref="Regex"/> instance.
         /// </summary>
         public static implicit operator Regex(Pattern pattern) => new Regex(pattern.Expression);
@@ -153,21 +150,25 @@ namespace FluentRegex.Core
         public bool ContainsMatch(string input) => Regex.IsMatch(input, Expression);
         /// <summary>
         ///Searches the input string for all occurrences of the pattern(partial match).
+        /// Does not add anchors.
         /// </summary>
         public Match Match(string input) => Regex.Match(input, Expression);
 
         /// <summary>
         /// Searches the input string for all occurrences of the pattern.
+        /// Does not add anchors.
         /// </summary>
         public MatchCollection Matches(string input) => Regex.Matches(input, Expression);
 
         /// <summary>
         /// Replaces all occurrences of the pattern in the input string with the replacement string.
+        /// Does not add anchors.
         /// </summary>
         public string Replace(string input, string replacement) => Regex.Replace(input, Expression, replacement);
 
         /// <summary>
         /// Splits the input string at each occurrence of the pattern.
+        /// Does not add anchors.
         /// </summary>
         public string[] Split(string input) => [.. Regex.Split(input, Expression)];
 
@@ -181,7 +182,7 @@ namespace FluentRegex.Core
 
 
 
-       
+
         /// <summary>
         /// Creates a pattern that matches any whitespace character (equivalent to \s).
         /// </summary>
@@ -221,7 +222,7 @@ namespace FluentRegex.Core
         /// Creates a pattern that matches a single digit (equivalent to \d).
         /// </summary>
         public static DigitPattern Digit() => new();
-         /// <summary>
+        /// <summary>
         /// Creates a pattern that matches a single letter a-z or A-Z.
         /// </summary>
         public static LetterPattern Letter() => new();
@@ -235,6 +236,23 @@ namespace FluentRegex.Core
         /// Creates a pattern that matches integer numbers.
         /// </summary>
         public static IntegerPattern Integer() => new();
+        #region Static Factory Methods — Backreferences
+
+        /// <summary>
+        /// Creates a named backreference (<c>\k&lt;name&gt;</c>) that matches the same text
+        /// previously captured by the named group.
+        /// </summary>
+        /// <param name="name">The name of the group to reference.</param>
+        public static BackreferencePattern Backreference(string name) => new(name);
+
+        /// <summary>
+        /// Creates a numbered backreference (<c>\1</c>, <c>\2</c>, etc.) that matches the same text
+        /// previously captured by the group at that position (1-based).
+        /// </summary>
+        /// <param name="number">The 1-based group number to reference.</param>
+        public static BackreferencePattern Backreference(int number) => new(number);
+
+        #endregion
 
         #region Static Factory Methods — Groups
 
@@ -291,7 +309,7 @@ namespace FluentRegex.Core
         public static LookaroundPattern LookAhead(Pattern inner)
         {
             ArgumentNullException.ThrowIfNull(inner);
-            return new LookaroundPattern("?=", inner);
+            return new LookaroundPattern(LookaroundKind.PositiveLookahead, inner);
         }
 
         /// <summary>
@@ -300,7 +318,7 @@ namespace FluentRegex.Core
         public static LookaroundPattern LookAheadNot(Pattern inner)
         {
             ArgumentNullException.ThrowIfNull(inner);
-            return new LookaroundPattern("?!", inner);
+            return new LookaroundPattern(LookaroundKind.NegativeLookahead, inner);
         }
 
         /// <summary>
@@ -309,7 +327,7 @@ namespace FluentRegex.Core
         public static LookaroundPattern LookBehind(Pattern inner)
         {
             ArgumentNullException.ThrowIfNull(inner);
-            return new LookaroundPattern("?<=", inner);
+            return new LookaroundPattern(LookaroundKind.PositiveLookbehind, inner);
         }
 
         /// <summary>
@@ -318,7 +336,7 @@ namespace FluentRegex.Core
         public static LookaroundPattern LookBehindNot(Pattern inner)
         {
             ArgumentNullException.ThrowIfNull(inner);
-            return new LookaroundPattern("?<!", inner);
+            return new LookaroundPattern(LookaroundKind.NegativeLookbehind, inner);
         }
 
         #endregion

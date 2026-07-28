@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FluentRegex.Core.Literals;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,12 +15,24 @@ namespace FluentRegex.Core.Patterns
     /// </summary>
     public sealed class LookaroundPattern : Pattern
     {
+        private static readonly string[] Syntax = ["?=", "?!", "?<=", "?<!"];
+
+        /// <inheritdoc />
         public override string Expression { get; }
+
+        /// <summary>
+        /// The kind of lookaround this pattern represents.
+        /// </summary>
+        internal LookaroundKind Kind { get; }
+
         internal override int Precedence => 3;
 
-        internal LookaroundPattern(string lookaroundType, Pattern inner)
+        internal override bool IsZeroWidth => true;
+
+        internal LookaroundPattern(LookaroundKind kind, Pattern inner)
         {
-            Expression = $"({lookaroundType}{inner.Expression})";
+            Kind = kind;
+            Expression = $"({Syntax[(int)kind]}{inner.Expression})";
         }
     }
 
