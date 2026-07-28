@@ -74,7 +74,7 @@
         [Fact]
         public void NamedBackreference_EmptyName_Throws()
         {
-            Assert.Throws<ArgumentException>(() => Pattern.Backreference(""));
+            Assert.Throws<ArgumentNullException>(() => Pattern.Backreference(""));
         }
 
         [Fact]
