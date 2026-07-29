@@ -9,7 +9,7 @@
     {
         public override string Expression { get; }
 
-        internal override int Precedence => 2;
+        protected internal override int Precedence => 2;
 
         internal QuantifiedPattern(Pattern inner, string quantifier)
         {

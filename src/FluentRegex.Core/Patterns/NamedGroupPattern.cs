@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace FluentRegex.Core.Patterns
 {
@@ -24,7 +19,7 @@ namespace FluentRegex.Core.Patterns
         /// </summary>
         public string Name { get; }
 
-        internal override int Precedence => 3;
+       protected internal override int Precedence => 3;
 
         internal NamedGroupPattern(string name, Pattern inner)
         {

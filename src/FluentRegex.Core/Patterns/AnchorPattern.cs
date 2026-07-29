@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FluentRegex.Core.Patterns
+﻿namespace FluentRegex.Core.Patterns
 {
     /// <summary>
     /// A zero-width assertion pattern (anchor) such as ^, $, \b, \B.
@@ -16,8 +10,8 @@ namespace FluentRegex.Core.Patterns
     {
         /// <inheritdoc />
         public override string Expression { get; }
-        internal override int Precedence => 3;
-        internal override bool IsZeroWidth => true;
+       protected internal override int Precedence => 3;
+        protected internal override bool IsZeroWidth => true;
         internal AnchorPattern(string expression)
         {
             Expression = expression;

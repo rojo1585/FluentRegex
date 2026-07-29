@@ -17,7 +17,7 @@ namespace FluentRegex.Core.Patterns
         /// Multi-character literals ("ab", "\+52") have precedence 1 (concatenation)
         /// so that quantifiers correctly wrap the whole literal.
         /// </summary>
-        internal override int Precedence => Expression.Length switch
+        protected internal override int Precedence => Expression.Length switch
         {
             1 => 3,
             2 when Expression[0] == '\\' => 3,
