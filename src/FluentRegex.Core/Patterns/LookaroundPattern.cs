@@ -1,9 +1,4 @@
 ﻿using FluentRegex.Core.Literals;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FluentRegex.Core.Patterns
 {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FluentRegex.Core.Patterns
+﻿namespace FluentRegex.Core.Patterns
 {
     /// <summary>
     /// A zero-width assertion pattern (anchor) such as ^, $, \b, \B.
