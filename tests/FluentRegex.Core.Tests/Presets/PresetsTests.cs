@@ -509,6 +509,15 @@ namespace FluentRegex.Core.Tests.Presets
             Assert.DoesNotContain(".", p1.Expression);
             Assert.Contains(".", p2.Expression);
         }
+        [Fact]
+        public void AllowChars_AccumulatesAcrossCalls()
+        {
+            var p = Core.Presets.Presets.Username().AllowChars('.').AllowChars('-');
+            Assert.Equal(@"[a-zA-Z_][a-zA-Z0-9_.\-]{2,29}", p.Expression);
+            Assert.True(p.IsMatch("a.b"));
+            Assert.True(p.IsMatch("a-b"));
+            Assert.True(p.IsMatch("a.-b"));
+        }
     }
     public class IbanTests
     {

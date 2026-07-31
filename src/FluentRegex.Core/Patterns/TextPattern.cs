@@ -92,18 +92,9 @@
                 parts.Add("0-9");
 
             if (_extraChars.Length > 0)
-                parts.Add(string.Concat(_extraChars.Select(EscapeForCharClass)));
+                parts.Add(string.Concat(_extraChars.Select(EscapeCharClassChar)));
 
             return "[" + string.Join("", parts) + "]";
         }
-
-        private static string EscapeForCharClass(char c) => c switch
-        {
-            '\\' => "\\\\",
-            ']' => "\\]",
-            '^' => "\\^",
-            '-' => "\\-",
-            _ => c.ToString()
-        };
     }
 }
