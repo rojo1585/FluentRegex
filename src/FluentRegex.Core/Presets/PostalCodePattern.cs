@@ -27,9 +27,7 @@
 
         internal PostalCodePattern(string? country = null, string? customPattern = null)
         {
-            ArgumentNullException.ThrowIfNull(country);
-
-            Country = country.ToUpper();
+            Country = country?.ToUpper();
 
             if (customPattern is not null)
                 Expression = customPattern;
