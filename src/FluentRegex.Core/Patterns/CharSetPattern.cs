@@ -25,17 +25,5 @@
             var prefix = negated ? "^" : "";
             Expression = $"[{prefix}{EscapeCharClassChar(from)}-{EscapeCharClassChar(to)}]";
         }
-        /// <summary>
-        /// Escapes characters that have special meaning inside a character class [...].
-        /// Inside character classes, only \, ], ^ (at start), and - (in middle) need escaping.
-        /// </summary>
-        private static string EscapeCharClassChar(char c) => c switch
-        {
-            '\\' => "\\\\",
-            ']' => "\\]",
-            '^' => "\\^",
-            '-' => "\\-",
-            _ => c.ToString()
-        };
     }
 }

@@ -7,14 +7,14 @@ using Xunit;
 using FluentRegex.Core.Presets;
 namespace FluentRegex.Core.Tests.Presets
 {
-    
+
 
     public class EmailTests
     {
         [Fact]
         public void Expression_MatchesExpected()
         {
-            var p = Core.Presets.Presets.Email();
+            var p = Core.Presets.Presets.SimpleEmail();
             Assert.Equal(@"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", p.Expression);
         }
 
@@ -24,7 +24,7 @@ namespace FluentRegex.Core.Tests.Presets
         [InlineData("user+tag@sub.domain.org")]
         public void IsMatch_ValidEmails_ReturnsTrue(string email)
         {
-            Assert.True(Core.Presets.Presets.Email().IsMatch(email));
+            Assert.True(Core.Presets.Presets.SimpleEmail().IsMatch(email));
         }
 
         [Theory]
@@ -33,7 +33,7 @@ namespace FluentRegex.Core.Tests.Presets
         [InlineData("user@.com")]
         public void IsMatch_InvalidEmails_ReturnsFalse(string email)
         {
-            Assert.False(Core.Presets.Presets.Email().IsMatch(email));
+            Assert.False(Core.Presets.Presets.SimpleEmail().IsMatch(email));
         }
     }
 
@@ -42,7 +42,7 @@ namespace FluentRegex.Core.Tests.Presets
         [Fact]
         public void Expression_MatchesExpected()
         {
-            var p = Core.Presets.Presets.Url();
+            var p = Core.Presets.Presets.SimpleUrl();
             Assert.Equal(@"https?://[a-zA-Z0-9.-]+(?:/[^\s]*)?", p.Expression);
         }
 
@@ -52,7 +52,7 @@ namespace FluentRegex.Core.Tests.Presets
         [InlineData("https://api.example.com/v1/users?id=42")]
         public void IsMatch_ValidUrls_ReturnsTrue(string url)
         {
-            Assert.True(Core.Presets.Presets.Url().IsMatch(url));
+            Assert.True(Core.Presets.Presets.SimpleUrl().IsMatch(url));
         }
 
         [Theory]
@@ -61,7 +61,7 @@ namespace FluentRegex.Core.Tests.Presets
         [InlineData("https://")]
         public void IsMatch_InvalidUrls_ReturnsFalse(string url)
         {
-            Assert.False(Core.Presets.Presets.Url().IsMatch(url));
+            Assert.False(Core.Presets.Presets.SimpleUrl().IsMatch(url));
         }
     }
 
@@ -210,7 +210,7 @@ namespace FluentRegex.Core.Tests.Presets
         [Fact]
         public void Expression_MatchesExpected()
         {
-            var p = Core.Presets.Presets.CreditCard();
+            var p = Core.Presets.Presets.SimpleCreditCard();
             Assert.Equal(@"\d{13,19}", p.Expression);
         }
 
@@ -220,7 +220,7 @@ namespace FluentRegex.Core.Tests.Presets
         [InlineData("1234567890123")]
         public void IsMatch_ValidCreditCards_ReturnsTrue(string card)
         {
-            Assert.True(Core.Presets.Presets.CreditCard().IsMatch(card));
+            Assert.True(Core.Presets.Presets.SimpleCreditCard().IsMatch(card));
         }
 
         [Theory]
@@ -229,28 +229,29 @@ namespace FluentRegex.Core.Tests.Presets
         [InlineData("4111-1111-1111-1111")]
         public void IsMatch_InvalidCreditCards_ReturnsFalse(string card)
         {
-            Assert.False(Core.Presets.Presets.CreditCard().IsMatch(card));
+            Assert.False(Core.Presets.Presets.SimpleCreditCard().IsMatch(card));
         }
     }
 
     public class PasswordPatternTests
     {
         [Fact]
-        public void Default_Expression_IsCorrect()
+        public void Default_Expression_IsHonest()
         {
             var p = Core.Presets.Presets.Password();
+            // Default: allows uppercase, lowercase, digits; 8-128 length; no lookaheads
             Assert.Equal("[A-Za-z0-9]{8,128}", p.Expression);
         }
 
         [Fact]
-        public void MinLength_ChangesExpression()
+        public void MinLength_ChangesQuantifier()
         {
             var p = Core.Presets.Presets.Password().MinLength(12);
             Assert.Equal("[A-Za-z0-9]{12,128}", p.Expression);
         }
 
         [Fact]
-        public void MaxLength_ChangesExpression()
+        public void MaxLength_ChangesQuantifier()
         {
             var p = Core.Presets.Presets.Password().MaxLength(64);
             Assert.Equal("[A-Za-z0-9]{8,64}", p.Expression);
@@ -264,41 +265,49 @@ namespace FluentRegex.Core.Tests.Presets
         }
 
         [Fact]
-        public void RequireUppercase_False_StillIncludesUppercaseInCharClass()
+        public void AllowUppercase_False_ExcludesUppercaseFromCharClass()
         {
-            var p = Core.Presets.Presets.Password().RequireUppercase(false);
-            Assert.Contains("A-Z", p.Expression);
-            Assert.Contains("a-z", p.Expression);
+            var p = Core.Presets.Presets.Password().AllowUppercase(false);
+            Assert.Equal("[a-z0-9]{8,128}", p.Expression);
         }
 
         [Fact]
-        public void RequireLowercase_False_RemovesLowercase()
+        public void AllowLowercase_False_ExcludesLowercaseFromCharClass()
         {
-            var p = Core.Presets.Presets.Password().RequireLowercase(false);
-            Assert.Contains("A-Z", p.Expression);
-            Assert.DoesNotContain("a-z", p.Expression);
+            var p = Core.Presets.Presets.Password().AllowLowercase(false);
+            Assert.Equal("[A-Z0-9]{8,128}", p.Expression);
         }
 
         [Fact]
-        public void RequireDigit_False_RemovesDigits()
+        public void AllowDigits_False_ExcludesDigitsFromCharClass()
         {
-            var p = Core.Presets.Presets.Password().RequireDigit(false);
-            Assert.DoesNotContain("0-9", p.Expression);
+            var p = Core.Presets.Presets.Password().AllowDigits(false);
+            Assert.Equal("[A-Za-z]{8,128}", p.Expression);
         }
 
         [Fact]
-        public void RequireSpecial_True_AddsSpecialChars()
+        public void AllowSpecial_True_AddsDefaultSpecialChars()
         {
-            var p = Core.Presets.Presets.Password().RequireSpecial(true);
+            var p = Core.Presets.Presets.Password().AllowSpecial();
             Assert.Contains("!", p.Expression);
             Assert.Contains("@", p.Expression);
             Assert.Contains("#", p.Expression);
+
+            Assert.DoesNotContain("(?=", p.Expression);
         }
 
         [Fact]
-        public void AllowedSpecialChars_SetsCustomChars()
+        public void AllowSpecial_False_ExcludesSpecialChars()
         {
-            var p = Core.Presets.Presets.Password().RequireSpecial(true).AllowedSpecialChars('!', '?');
+            var p = Core.Presets.Presets.Password().AllowSpecial().AllowSpecial(false);
+            Assert.DoesNotContain("!", p.Expression);
+            Assert.DoesNotContain("@", p.Expression);
+        }
+
+        [Fact]
+        public void WithSpecialChars_SetsCustomCharsAndEnablesSpecial()
+        {
+            var p = Core.Presets.Presets.Password().WithSpecialChars('!', '?');
             Assert.Contains("!", p.Expression);
             Assert.Contains("?", p.Expression);
             Assert.DoesNotContain("@", p.Expression);
@@ -308,7 +317,7 @@ namespace FluentRegex.Core.Tests.Presets
         public void Immutability_ChangingOneInstanceDoesNotAffectAnother()
         {
             var p1 = Core.Presets.Presets.Password();
-            var p2 = p1.RequireSpecial(true);
+            var p2 = p1.AllowSpecial();
 
             Assert.DoesNotContain("!", p1.Expression);
             Assert.Contains("!", p2.Expression);
@@ -317,9 +326,11 @@ namespace FluentRegex.Core.Tests.Presets
         [Theory]
         [InlineData("Abcdef12")]
         [InlineData("Password123")]
+        [InlineData("A1b2c3d4")]
         [InlineData("abcdefgh")]
         [InlineData("ABCDEFGH")]
-        public void IsMatch_ValidPasswords_ReturnsTrue(string password)
+        [InlineData("Abcdefgh")]
+        public void IsMatch_MatchingStrings_ReturnsTrue(string password)
         {
             Assert.True(Core.Presets.Presets.Password().IsMatch(password));
         }
@@ -327,28 +338,103 @@ namespace FluentRegex.Core.Tests.Presets
         [Theory]
         [InlineData("Abc12")]
         [InlineData("abc defgh")]
-        public void IsMatch_InvalidPasswords_ReturnsFalse(string password)
+        [InlineData("Abcdef1!")]
+        public void IsMatch_NonMatchingStrings_ReturnsFalse(string password)
         {
             Assert.False(Core.Presets.Presets.Password().IsMatch(password));
         }
 
         [Fact]
-        public void WithSpecialChars_ValidPassword()
+        public void AllowSpecial_PasswordWithSpecialMatches()
         {
-            var p = Core.Presets.Presets.Password().RequireSpecial(true);
+            var p = Core.Presets.Presets.Password().AllowSpecial();
             Assert.True(p.IsMatch("Abcdef1!"));
+            Assert.True(p.IsMatch("abcdefgh"));
         }
 
         [Fact]
-        public void WithSpecialChars_CharClassIncludesBaseAndSpecial()
+        public void AllowUppercase_False_RejectsUppercase()
         {
-            var p = Core.Presets.Presets.Password().RequireSpecial(true);
-            Assert.True(p.IsMatch("Abcdef12"));
-            Assert.True(p.IsMatch("Abcdef1!"));
-            Assert.False(p.IsMatch("Abcdef1 "));
+            var p = Core.Presets.Presets.Password().AllowUppercase(false);
+            Assert.True(p.IsMatch("abcdefgh12"));
+            Assert.False(p.IsMatch("Abcdefgh12"));
         }
-    }
 
+        [Fact]
+        public void AllowDigits_False_RejectsDigits()
+        {
+            var p = Core.Presets.Presets.Password().AllowDigits(false);
+            Assert.True(p.IsMatch("Abcdefgh"));
+            Assert.False(p.IsMatch("Abcdef12"));
+        }
+
+        [Fact]
+        public void OnlyLowercaseAndDigits_PinPattern()
+        {
+            var p = Core.Presets.Presets.Password()
+                .AllowUppercase(false)
+                .MinLength(4)
+                .MaxLength(6);
+            Assert.Equal("[a-z0-9]{4,6}", p.Expression);
+            Assert.True(p.IsMatch("abcd12"));
+            Assert.False(p.IsMatch("Abcd12"));
+        }
+        #region Validation
+
+        [Fact]
+        public void MinLength_Zero_Throws()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Core.Presets.Presets.Password().MinLength(0));
+        }
+
+        [Fact]
+        public void MinLength_Negative_Throws()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Core.Presets.Presets.Password().MinLength(-1));
+        }
+
+        [Fact]
+        public void MaxLength_Zero_Throws()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Core.Presets.Presets.Password().MaxLength(0));
+        }
+
+        [Fact]
+        public void MaxLength_Negative_Throws()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Core.Presets.Presets.Password().MaxLength(-5));
+        }
+
+        [Fact]
+        public void MaxLength_LessThanMinLength_Throws()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Core.Presets.Presets.Password().MinLength(20).MaxLength(10));
+        }
+
+        [Fact]
+        public void WithSpecialChars_EmptyArray_Throws()
+        {
+            Assert.Throws<ArgumentException>(() => Core.Presets.Presets.Password().WithSpecialChars());
+        }
+
+        [Fact]
+        public void AllCategoriesDisabled_Throws()
+        {
+            Assert.Throws<InvalidOperationException>(() => Core.Presets.Presets.Password()
+                .AllowUppercase(false)
+                .AllowLowercase(false)
+                .AllowDigits(false));
+        }
+
+        [Fact]
+        public void MinLength_EqualToMaxLength_IsValid()
+        {
+            var p = Core.Presets.Presets.Password().MinLength(10).MaxLength(10);
+            Assert.Equal("[A-Za-z0-9]{10}", p.Expression);
+        }
+
+        #endregion
+    }
     public class UsernamePatternTests
     {
         [Fact]
@@ -376,7 +462,16 @@ namespace FluentRegex.Core.Tests.Presets
         public void AllowChars_AddsExtraCharacters()
         {
             var p = Core.Presets.Presets.Username().AllowChars('.', '-');
-            Assert.Equal("[a-zA-Z_][a-zA-Z0-9_.-]{2,29}", p.Expression);
+            Assert.Equal(@"[a-zA-Z_][a-zA-Z0-9_.\-]{2,29}", p.Expression);
+        }
+
+        [Fact]
+        public void AllowChars_EscapesSpecialCharClassCharacters()
+        {
+            var p = Core.Presets.Presets.Username().AllowChars(']', '\\', '^', '-');
+            Assert.Equal(@"[a-zA-Z_][a-zA-Z0-9_\]\\\^\-]{2,29}", p.Expression);
+            Assert.True(p.IsMatch("ab]"));
+            Assert.True(p.IsMatch("ab\\"));
         }
 
         [Fact]
@@ -414,8 +509,16 @@ namespace FluentRegex.Core.Tests.Presets
             Assert.DoesNotContain(".", p1.Expression);
             Assert.Contains(".", p2.Expression);
         }
+        [Fact]
+        public void AllowChars_AccumulatesAcrossCalls()
+        {
+            var p = Core.Presets.Presets.Username().AllowChars('.').AllowChars('-');
+            Assert.Equal(@"[a-zA-Z_][a-zA-Z0-9_.\-]{2,29}", p.Expression);
+            Assert.True(p.IsMatch("a.b"));
+            Assert.True(p.IsMatch("a-b"));
+            Assert.True(p.IsMatch("a.-b"));
+        }
     }
-
     public class IbanTests
     {
         [Fact]
