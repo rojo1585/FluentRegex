@@ -7,7 +7,7 @@
     public sealed class PostalCodePattern : Pattern
     {
         public override string Expression { get; }
-       protected internal override int Precedence => 1;
+        protected internal override int Precedence => 1;
         internal string? Country { get; }
 
         private static readonly Dictionary<string, string> CountryPatterns = new()

@@ -1,6 +1,5 @@
 ﻿namespace FluentRegex.Core.Presets
 {
-
     /// <summary>
     /// A configurable password pattern. Use via <see cref="Presets.Password"/>.
     /// Immutable — each fluent method returns a new instance.
@@ -39,8 +38,28 @@
             bool allowSpecial = false,
             char[]? specialChars = null)
         {
+            var max = maxLength ?? 128;
+
+            if (minLength < 1)
+                throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
+                    "Minimum length must be at least 1.");
+            if (max < 1)
+                throw new ArgumentOutOfRangeException(nameof(maxLength), max,
+                    "Maximum length must be at least 1.");
+            if (max < minLength)
+                throw new ArgumentOutOfRangeException(nameof(maxLength), max,
+                    $"Maximum length ({max}) must be greater than or equal to minimum length ({minLength}).");
+            if (allowSpecial && specialChars is { Length: 0 })
+                throw new ArgumentException(
+                    "Special character set cannot be empty when special characters are allowed.",
+                    nameof(specialChars));
+            if (!allowUppercase && !allowLowercase && !allowDigits && !allowSpecial)
+                throw new InvalidOperationException(
+                    "At least one character category must be allowed. " +
+                    "Disable all categories results in an empty character class.");
+
             _minLength = minLength;
-            _maxLength = maxLength ?? 128;
+            _maxLength = max;
             _allowUppercase = allowUppercase;
             _allowLowercase = allowLowercase;
             _allowDigits = allowDigits;
@@ -103,7 +122,7 @@
             if (_allowSpecial)
             {
                 var special = _specialChars ?? DefaultSpecialChars;
-                foreach (var c in special) allowedParts.Add(EscapeCharClass(c));
+                foreach (var c in special) allowedParts.Add(EscapeCharClassChar(c));
             }
 
             var charClass = string.Join("", allowedParts);
@@ -113,14 +132,5 @@
 
             return $"[{charClass}]{quantifier}";
         }
-
-        private static string EscapeCharClass(char c) => c switch
-        {
-            ']' => @"\]",
-            '\\' => @"\\\\",
-            '^' => @"\^",
-            '-' => @"\-",
-            _ => c.ToString()
-        };
     }
 }

@@ -1,6 +1,5 @@
 ﻿namespace FluentRegex.Core.Presets
 {
-
     /// <summary>
     /// A configurable username pattern. Use via <see cref="Presets.Username"/>.
     /// Immutable — each fluent method returns a new instance.
@@ -8,7 +7,7 @@
     public sealed class UsernamePattern : Pattern
     {
         public override string Expression { get; }
-        protected internal override int Precedence => 1;
+       protected internal override int Precedence => 1;
 
         private readonly int _minLength;
         private readonly int _maxLength;
@@ -22,7 +21,7 @@
 
             var chars = "a-zA-Z0-9_";
             if (extraChars is { Length: > 0 })
-                chars += new string(extraChars);
+                chars += string.Concat(extraChars.Select(EscapeCharClassChar));
 
             var firstChar = "[a-zA-Z_]";
             var restChar = $"[{chars}]";
@@ -44,6 +43,7 @@
 
         /// <summary>
         /// Allows additional characters beyond the default alphanumeric + underscore.
+        /// <para>Special characters like <c>]</c>, <c>\</c>, <c>^</c>, <c>-</c> are automatically escaped.</para>
         /// </summary>
         public UsernamePattern AllowChars(params char[] chars) => new(_minLength, _maxLength, chars);
     }

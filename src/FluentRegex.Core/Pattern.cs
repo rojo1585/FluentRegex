@@ -344,6 +344,18 @@ namespace FluentRegex.Core
         /// Returns the regex string representation of this pattern.
         /// </summary>
         public override string ToString() => Expression;
+        /// <summary>
+        /// Escapes characters that have special meaning inside a character class <c>[...]</c>.
+        /// <para>Characters <c>\</c>, <c>]</c>, <c>^</c>, and <c>-</c> are escaped with a backslash.</para>
+        /// </summary>
+        internal static string EscapeCharClassChar(char c) => c switch
+        {
+            '\\' => "\\\\",
+            ']' => "\\]",
+            '^' => "\\^",
+            '-' => "\\-",
+            _ => c.ToString()
+        };
     }
 }
 
