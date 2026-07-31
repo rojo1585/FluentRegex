@@ -14,7 +14,7 @@ namespace FluentRegex.Core.Tests.Presets
         [Fact]
         public void Expression_MatchesExpected()
         {
-            var p = Core.Presets.Presets.Email();
+            var p = Core.Presets.Presets.SimpleEmail();
             Assert.Equal(@"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", p.Expression);
         }
 
@@ -24,7 +24,7 @@ namespace FluentRegex.Core.Tests.Presets
         [InlineData("user+tag@sub.domain.org")]
         public void IsMatch_ValidEmails_ReturnsTrue(string email)
         {
-            Assert.True(Core.Presets.Presets.Email().IsMatch(email));
+            Assert.True(Core.Presets.Presets.SimpleEmail().IsMatch(email));
         }
 
         [Theory]
@@ -33,7 +33,7 @@ namespace FluentRegex.Core.Tests.Presets
         [InlineData("user@.com")]
         public void IsMatch_InvalidEmails_ReturnsFalse(string email)
         {
-            Assert.False(Core.Presets.Presets.Email().IsMatch(email));
+            Assert.False(Core.Presets.Presets.SimpleEmail().IsMatch(email));
         }
     }
 
@@ -42,7 +42,7 @@ namespace FluentRegex.Core.Tests.Presets
         [Fact]
         public void Expression_MatchesExpected()
         {
-            var p = Core.Presets.Presets.Url();
+            var p = Core.Presets.Presets.SimpleUrl();
             Assert.Equal(@"https?://[a-zA-Z0-9.-]+(?:/[^\s]*)?", p.Expression);
         }
 
@@ -52,7 +52,7 @@ namespace FluentRegex.Core.Tests.Presets
         [InlineData("https://api.example.com/v1/users?id=42")]
         public void IsMatch_ValidUrls_ReturnsTrue(string url)
         {
-            Assert.True(Core.Presets.Presets.Url().IsMatch(url));
+            Assert.True(Core.Presets.Presets.SimpleUrl().IsMatch(url));
         }
 
         [Theory]
@@ -61,7 +61,7 @@ namespace FluentRegex.Core.Tests.Presets
         [InlineData("https://")]
         public void IsMatch_InvalidUrls_ReturnsFalse(string url)
         {
-            Assert.False(Core.Presets.Presets.Url().IsMatch(url));
+            Assert.False(Core.Presets.Presets.SimpleUrl().IsMatch(url));
         }
     }
 
@@ -210,7 +210,7 @@ namespace FluentRegex.Core.Tests.Presets
         [Fact]
         public void Expression_MatchesExpected()
         {
-            var p = Core.Presets.Presets.CreditCard();
+            var p = Core.Presets.Presets.SimpleCreditCard();
             Assert.Equal(@"\d{13,19}", p.Expression);
         }
 
@@ -220,7 +220,7 @@ namespace FluentRegex.Core.Tests.Presets
         [InlineData("1234567890123")]
         public void IsMatch_ValidCreditCards_ReturnsTrue(string card)
         {
-            Assert.True(Core.Presets.Presets.CreditCard().IsMatch(card));
+            Assert.True(Core.Presets.Presets.SimpleCreditCard().IsMatch(card));
         }
 
         [Theory]
@@ -229,7 +229,7 @@ namespace FluentRegex.Core.Tests.Presets
         [InlineData("4111-1111-1111-1111")]
         public void IsMatch_InvalidCreditCards_ReturnsFalse(string card)
         {
-            Assert.False(Core.Presets.Presets.CreditCard().IsMatch(card));
+            Assert.False(Core.Presets.Presets.SimpleCreditCard().IsMatch(card));
         }
     }
 
