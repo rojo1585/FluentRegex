@@ -15,6 +15,16 @@
 
         internal UsernamePattern(int minLength = 3, int maxLength = 30, char[]? extraChars = null)
         {
+            if (minLength < 1)
+                throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
+                    "Minimum length must be at least 1.");
+            if (maxLength < 1)
+                throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength,
+                    "Maximum length must be at least 1.");
+            if (maxLength < minLength)
+                throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength,
+                    $"Maximum length ({maxLength}) must be greater than or equal to minimum length ({minLength}).");
+
             _minLength = minLength;
             _maxLength = maxLength;
             _extraChars = extraChars ?? [];
