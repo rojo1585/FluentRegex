@@ -92,13 +92,12 @@ public static class Presets
     public static Pattern MacAddress() => new SimplePattern(@"[0-9a-fA-F]{2}(?::[0-9a-fA-F]{2}){5}");
 
     /// <summary>
-    /// Matches a generic IBAN format: 2-letter country code + 2 check digits + BBAN (variable length).
+    /// Creates a configurable password pattern. Chain fluent methods to customize.
+    /// <para>Default: 8-128 chars, allows uppercase, lowercase, and digits.
+    /// Special characters are not allowed by default.</para>
     /// <para>
-    /// <b>Limitations:</b> Validates the structural format only.
-    /// Does not perform the IBAN check-digit algorithm. Country-specific
-    /// BBAN length rules are not enforced (total length 16-34 chars accepted).
-    /// </para>
-    /// <para>Expression: <c>[A-Z]{2}\d{2}[A-Z0-9]{4}(?:[A-Z0-9]{4,}){3}</c></para>
+    /// The <c>Allow*</c> methods control which character categories are <b>permitted</b>
+    /// in the character class — they do not enforce presence via lookaheads.
     /// </summary>
     public static Pattern Iban() => new SimplePattern(@"[A-Z]{2}\d{2}[A-Z0-9]{4}(?:[A-Z0-9]{4,}){3}");
 
